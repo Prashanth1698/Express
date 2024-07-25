@@ -7,6 +7,11 @@ const express = require('express');
 const app = express();
 const Joi = require('joi');
 const { shuffle } = require('underscore');
+const startupDebugger = require('debug') ('app:startup')
+const dbDebugger = require('debug')('app:db');
+
+app.set('view engine', 'pug');
+app.set('view', './views')//default 
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -15,14 +20,19 @@ app.use(helmet());
 
 if(app.get('env') === 'development'){
     app.use(morgan('tiny'));
-    console.log('morgan enabled....');
+    startupDebugger('morgan enabled....');
 }
+
+//DB 
+
+dbDebugger('connected to te=he database....')
 
 app.use(logger);
 
 // configuration
 console.log('Application Name:' + config.get('name'));
 console.log('mail Server:' + config.get('mail.host'));
+console.log('mail Password:' + config.get('mail.password'));
 
 
 app.use(function (req, res, next) {
@@ -38,8 +48,10 @@ const courses = [
 ];
 
 app.get('/', (req, res) => {
-    res.send("Hello!!!!!!!!!!!!");
+   // res.send("Hello!!!!!!!!!!!!");
+    res.render('index', {title: ' My Express app', message: 'Hello'});
 });
+
 
 app.get('/api/courses', (req, res) => {
     res.send(courses);
